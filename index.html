@@ -1,0 +1,147 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sistema Halcón</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: terminal corporativa; barra de estado arriba, panel de claves a la izquierda, consola de misión a la derecha. Una sola apariencia oscura, elegida a propósito. */
+:root{--bg:#0d1218;--panel:#131b24;--line:#243241;--fg:#d5dee8;--dim:#7d8fa2;--amber:#f0a93b;--ok:#4fc08d;--bad:#e5645a;--ink:#0d1218;color-scheme:dark;
+--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;--sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);padding-block:0 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto}
+header.bar{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--line);font:500 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.bar b{color:var(--fg);font-weight:600}
+.st{padding:2px 8px;border:1px solid var(--line);color:var(--amber)}
+.st.ok{color:var(--ok);border-color:var(--ok)}
+main{display:grid;grid-template-columns:230px minmax(0,1fr);gap:24px;margin-top:22px}
+@media(max-width:720px){main{grid-template-columns:1fr}}
+aside{align-self:start;border:1px solid var(--line);background:var(--panel);padding:14px 16px}
+aside h2,.lbl{font:500 11px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 10px}
+.slot{font:500 13px/1.4 var(--mono);padding:7px 0;border-top:1px solid var(--line);color:var(--dim)}
+.slot.on{color:var(--ok)}
+.slot.act{color:var(--amber)}
+.screen{border:1px solid var(--line);background:var(--panel);padding:22px clamp(16px,4vw,28px);min-width:0}
+h1{font:600 clamp(20px,4.5vw,28px)/1.2 var(--mono);letter-spacing:.02em;margin:0 0 6px;text-wrap:balance}
+h3{font:600 17px/1.3 var(--mono);margin:0 0 12px;color:var(--amber);letter-spacing:.04em}
+p{margin:0 0 12px;max-width:64ch}
+.mono{font-family:var(--mono)}
+.big{font:600 13px/1.4 var(--mono);letter-spacing:.12em;color:var(--amber);margin-bottom:14px}
+.msg{border-left:2px solid var(--line);padding:2px 0 2px 14px;margin:14px 0;font-family:var(--mono);font-size:14px}
+.msg.ok{border-color:var(--ok)}.msg.bad{border-color:var(--bad);color:#f1b3ad}.msg.warn{border-color:var(--amber)}
+.msg p{margin:0 0 6px}
+.seal{font:600 15px/1.4 var(--mono);color:var(--ok);letter-spacing:.04em;margin:10px 0}
+form{display:grid;gap:14px;margin-top:16px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:grid;gap:5px;font:500 11px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+input,select{width:100%;background:var(--bg);color:var(--fg);border:1px solid var(--line);padding:10px 11px;font:500 15px/1.2 var(--mono);border-radius:0}
+input::placeholder{color:#4a5a6b}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button{font:600 13px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;background:var(--amber);color:var(--ink);border:0;padding:13px 18px;cursor:pointer;justify-self:start;border-radius:0}
+button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line);padding:10px 12px}
+button:hover{filter:brightness(1.1)}
+.con{margin-top:22px;border-top:1px solid var(--line);padding-top:14px}
+.con form{grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:0;align-items:end}
+.con label{text-transform:none;letter-spacing:.04em}
+.foot{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font:12px var(--mono);color:var(--dim)}
+.imp{border:1px solid var(--amber);padding:10px 14px;margin:16px 0;font:500 13px/1.5 var(--mono);color:var(--amber)}
+.imp p{margin:0 0 4px}
+.rest{font:600 clamp(24px,6vw,38px)/1.15 var(--mono);color:var(--ok);margin:8px 0 18px;letter-spacing:.03em}
+.rest-l{font:600 15px/1.5 var(--mono)}
+.chk{font:500 14px/1.9 var(--mono)}
+.chk span{color:var(--ok)}
+@media(prefers-reduced-motion:no-preference){.screen{animation:in .25s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+<div class="wrap">
+<header class="bar"><span><b>SISTEMA HALCÓN</b> · Agencia Halcón &amp; Asociados</span><span id="eq"></span><span class="st" id="st">ESTADO: BLOQUEADO</span></header>
+<main><aside><h2>Claves del sistema</h2><div id="slots"></div></aside><section class="screen" id="screen" aria-live="polite"></section></main>
+</div>
+<script>
+function norm(s){s=String(s==null?'':s).normalize('NFC').toUpperCase();s=s.replace(/[ÁÀÄ]/g,'A').replace(/[ÉÈË]/g,'E').replace(/[ÍÌÏ]/g,'I').replace(/[ÓÒÖ]/g,'O').replace(/[ÚÙÜ]/g,'U').replace(/%/g,'');s=s.replace(/(\d)\.(?=\d{3}(?!\d))/g,'$1').replace(/\./g,',');s=s.replace(/[\s ]+/g,'').replace(/[-–—]+/g,'-').replace(/^-|-$/g,'');return s;}
+function h(ctx,v){var str='HALCON-7|'+ctx+'|'+norm(v),a=0xdeadbeef,b=0x41c6ce57,i,c;for(i=0;i<str.length;i++){c=str.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677);}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return (4294967296*(2097151&b)+(a>>>0)).toString(36);}
+
+const D={"k":{"1":["1i5an4sdwzt"],"2":["20jt4i19dfp"],"3":["6fzutwz9tq"],"4":["11rscihsg47"],"5":["1ruq3sthg98"]},"c":{"1.1":["uzx7y8qwx0"],"1.2":["1g4wszdpqs3"],"1.3":["25b1gbixh7i"],"1.4":["2enyq7ypuo9"],"2.1":["y3jeh916iq","933s5unhv7","1eh6qrpdfsw","dffgg14vpp"],"2.2":["sedgcxq02m"],"2.3":["271gqfsjufi"],"2.4":["1bzonlqd579"],"3.1":["mtn46k8w1h"],"3.2":["7u6o6aqgzi"],"3.3":["9jik2wzqbs"],"3.4":["7zyefdup0h"],"4.1":["mn8fhvfyoq"],"4.2":["1ypzqyo1gnd"],"4.3":["4kmaoowqm7"],"4.4":["1apej1shx0o"],"5.1":["ra2o2w6hvi"],"5.2":["1cu0gfdkmll"],"5.3":["1g9x7e7pnlt"]},"ev":{"a":["14xsq730ti5"],"b":["1alw6ujq3x9"],"c":["fkdiz0ozxb"],"d":["1enjd3lqutf"],"e":["r6r7e899km"]},"memo":["2bat8bkd4ff","221w5kt01uu","2472rgl6qs7","1vmlno9xgsv","ox3lm5o78v"],"rec":["1y7ogdtnoy4","1n4ncov82us","2374tg9ob95","12mv7ssp8o5","27630zmiov5","138fk1qzhy6"],"kpi":["1gff2q59yvx","f161njmz9i","21m347oh906","10dz3s0wal4","nd3ld36y65","1roxx2wnawp","cn2fshfqrm","a5r44gh1ez"],"fr":["1s23llbuso","2c8mukc8y9j","16iyxp4celo"]};
+var $=function(i){return document.getElementById(i)};
+var MIS=[
+{n:1,name:'AUDIENCIA',kl:9,codes:['1.1','1.2','1.3','1.4'],ok:['CLAVE 1: AUDIENCIA. Módulo restablecido.','Mensaje de Lucía: “Ya sabemos a quién le hablamos y qué se puede afirmar sobre esa audiencia. El módulo MEDICIÓN tiene las etiquetas del funnel desordenadas.”']},
+{n:2,name:'MEDICIÓN',kl:8,codes:['2.1','2.2','2.3','2.4'],ok:['CLAVE 2: MEDICIÓN. Etiquetas del funnel restablecidas.','Mensaje de Lucía: “Ya sabemos qué se mide y cómo se lee. El módulo CAMPAÑA muestra cuatro canales con números que no se pueden comparar a simple vista.”']},
+{n:3,name:'CAMPAÑA',kl:7,codes:['3.1','3.2','3.3','3.4'],ok:['CLAVE 3: CAMPAÑA. Módulo restablecido.','Mensaje de Lucía: “Ya sabemos qué canal rindió qué y qué no. Falta mirar plataformas con modelos de negocio muy distintos: ahí la misma métrica no vale lo mismo.”']},
+{n:4,name:'PLATAFORMAS',kl:11,codes:['4.1','4.2','4.3','4.4'],ok:['CLAVE 4 DESBLOQUEADA. Módulo PLATAFORMAS restablecido.','Mensaje de Lucía: “Queda el módulo más delicado: el buscador y la inteligencia artificial.”'],extra:'MISIÓN SUPERADA.'},
+{n:5,name:'DECISIÓN',kl:8,codes:['5.1','5.2','5.3'],ok:['CLAVE 5 DESBLOQUEADA. Las cinco claves están recuperadas. Para abrir el nivel final, ingresen las cinco claves en el orden del recorrido analítico.']}
+];
+var S;try{S=JSON.parse(localStorage.getItem('halcon7')||'null')}catch(e){S=null}
+if(!S||typeof S.stage!=='number')S={stage:0,team:0,rec:[],fails:{},helps:{},done:{},p5:0};
+function save(){try{localStorage.setItem('halcon7',JSON.stringify(S))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function has(arr,ctx,v){return arr.indexOf(h(ctx,v))>=0}
+function slots(){var o='';for(var i=1;i<=5;i++){var r=S.rec.indexOf(i)>=0;var act=!r&&S.stage===i;o+='<div class="slot '+(r?'on':act?'act':'')+'">'+(r?'✓ '+MIS[i-1].name:(act?'▸ ':'□ ')+'CLAVE '+i+' '+(act?'EN CURSO':'BLOQUEADA'))+'</div>'}$('slots').innerHTML=o}
+var notice='';var keep={};function cap(){keep={};document.querySelectorAll('#screen input[id],#screen select[id]').forEach(function(x){if(x.id!=='cmd')keep[x.id]=x.value})}
+function bar(){$('eq').innerHTML=S.team?'EQUIPO <b>'+S.team+'</b>':'';var st=$('st');var t=S.stage>=7?'ESTADO: RESTAURADO':S.stage===0?'ESTADO: BLOQUEADO':S.stage===6?'ESTADO: CLAVES RECUPERADAS':'ESTADO: EN RECUPERACIÓN';st.textContent=t;st.className='st'+(S.stage>=7?' ok':'')}
+function cons(){return '<div class="con"><form id="cf" autocomplete="off"><label for="cmd">Consola Halcón<input id="cmd" placeholder="Escriban AYUDA si están bloqueados"></label><button class="ghost" type="submit">Enviar</button></form><div id="cout"></div></div>'}
+function foot(){return '<div class="foot"><span>Este sistema solo valida. El análisis se hace en la mesa.</span><button class="ghost" id="rs" type="button">Cambiar de equipo</button></div>'}
+function boot(){return '<div class="big">OPERACIÓN: RECUPERAR EL DASHBOARD</div><h1>SISTEMA HALCÓN</h1><div class="msg warn"><p>ESTADO: BLOQUEADO</p></div>'+
+'<p>La agencia está a pocas horas de presentar el dashboard anual a su cliente.</p><p>El sistema de analítica fue intervenido.</p><p>Los datos siguen existiendo, pero el proceso que permite interpretarlos y tomar decisiones quedó fragmentado.</p><p>Para restaurarlo deberán recuperar cinco claves.</p>'+
+'<form id="bf"><label for="tm">Equipo<select id="tm">'+[1,2,3,4,5,6].map(function(i){return '<option value="'+i+'">EQUIPO '+i+'</option>'}).join('')+'</select></label><button type="submit">Iniciar</button></form>'}
+function fields(m){var o='<label for="fk">Clave <span class="mono" style="color:var(--dim)">('+m.kl+' letras)</span><input id="fk" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="'+new Array(m.kl+1).join('·')+'"></label><div class="row">';
+m.codes.forEach(function(c){o+='<label for="f'+c+'">Código '+c+'<input id="f'+c+'" autocomplete="off" spellcheck="false" placeholder="—"></label>'});
+return o+'</div><label for="fp" style="max-width:220px">Fichas de pista usadas<input id="fp" inputmode="numeric" placeholder="0"></label>'}
+function mission(m){var o='<div class="big">MISIÓN '+m.n+' — '+m.name+'</div><h1>Accedan al SOBRE MISIÓN '+m.n+'.</h1><p>Resuelvan los desafíos.</p><p>Conserven la bitácora.</p><p>Cuando hayan reconstruido la clave, vuelvan al Sistema Halcón.</p>';
+if(m.n===5&&S.p5===1){o='<div class="big">MISIÓN 5 — DECISIÓN</div>'+msg('ok',[MIS[4].ok[0]])+'<form id="rf"><label>Recorrido analítico</label><div class="row">';for(var i=1;i<=5;i++)o+='<label for="r'+i+'">Clave '+i+'<input id="r'+i+'" autocomplete="off" spellcheck="false" placeholder="—"></label>';return o+'</div><button type="submit">Validar recorrido</button></form>'+(notice?notice:'')}
+if(!S.open||S.open!==m.n)return o+'<form id="of"><button type="submit">Ingresar clave</button></form>';
+return o+'<form id="mf">'+fields(m)+'<button type="submit">Validar</button></form>'+(notice?notice:'')}
+function msg(c,l){return '<div class="msg '+c+'">'+l.map(function(x){return '<p>'+esc(x)+'</p>'}).join('')+'</div>'}
+function imp(){return '<div class="imp"><p>IMPORTANTE</p><p>Conserven la BITÁCORA de esta misión.</p><p>La necesitarán nuevamente.</p></div>'}
+function sealScr(m){var o='<div class="big">MISIÓN '+m.n+' — '+m.name+'</div><div class="seal">CLAVE VALIDADA. MISIÓN RECUPERADA.</div>';
+if(m.n===5)o+=msg('ok',['SELLO M5 · DECISIÓN · E'+S.team,'Desafío final habilitado. Esperen la indicación de su docente.']);
+else o+=msg('ok',m.ok.concat([]))+'<div class="seal">SELLO M'+m.n+' · '+m.name+' · E'+S.team+'</div>'+(m.extra?'<p class="mono">'+m.extra+'</p>':'')+'<p class="mono">Anoten el sello en la bitácora y esperen la palabra de habilitación de su docente.</p>';
+o+=imp();
+var b=m.n===5?'Continuar':'Continuar a la misión '+(m.n+1);
+return o+'<form id="nf"><button type="submit">'+b+'</button></form>'}
+function fin(){var o='<div class="big">SISTEMA HALCÓN</div><h1>LAS CINCO CLAVES HAN SIDO RECUPERADAS.</h1><p>Pero el dashboard todavía no puede restaurarse.</p><p>Los datos están disponibles.</p><p>Ahora falta lo más importante:</p><p class="mono" style="color:var(--amber);font-weight:600">DECIDIR QUÉ HACER CON ELLOS.</p><div class="msg ok"><p>DESAFÍO FINAL DESBLOQUEADO.</p><p>ABRAN EL SOBRE FINAL.</p></div>'+
+'<p class="mono" style="color:var(--dim);font-size:13px">Usen el Sobre Final y sus cinco bitácoras. Cuando tengan la línea de validación, completen:</p>'+
+'<form id="ff"><div class="row">';
+['AUDIENCIA','MEDICIÓN','CAMPAÑA','PLATAFORMAS','DECISIÓN'].forEach(function(n,i){o+='<label for="e'+i+'">Evidencia · '+n+'<input id="e'+i+'" autocomplete="off" spellcheck="false" placeholder="—"></label>'});
+o+='</div><label for="fm">Misiones en el memo (claves separadas por coma)<input id="fm" autocomplete="off" spellcheck="false" placeholder="—"></label><div class="row">';
+for(var i=0;i<6;i++)o+='<label for="rc'+i+'">Recorrido · paso '+(i+1)+'<input id="rc'+i+'" autocomplete="off" spellcheck="false" placeholder="—"></label>';
+o+='</div><label for="fkpi">KPI principal<input id="fkpi" autocomplete="off" spellcheck="false" placeholder="—"></label><div class="row">';
+for(var j=0;j<3;j++)o+='<label for="fr'+j+'">Frase · palabra '+(j+1)+'<input id="fr'+j+'" autocomplete="off" spellcheck="false" placeholder="—"></label>';
+o+='</div><label for="fp" style="max-width:220px">Pistas usadas<input id="fp" inputmode="numeric" placeholder="0"></label><button type="submit">Validar decisión</button></form>'+(notice?notice:'');return o}
+function done(){return '<div class="big">SISTEMA HALCÓN</div><div id="vl" class="chk">VALIDANDO DECISIÓN...<br><br>OBJETIVO: <span>VALIDADO</span><br>DATOS: <span>VALIDADOS</span><br>INTERPRETACIÓN: <span>VALIDADA</span><br>HIPÓTESIS: <span>VALIDADA</span><br>DECISIÓN: <span>VALIDADA</span><br>NUEVA MEDICIÓN: <span>VALIDADA</span><br><br>RESTAURANDO SISTEMA...</div><div id="rr"><div class="rest">SISTEMA RESTAURADO</div><div class="rest-l"><p>Han recuperado el sistema de analítica.</p><p>Pero recuperar datos no era el verdadero desafío.</p><p>El desafío era saber qué hacer con ellos.</p><p style="color:var(--amber)">LOS DATOS NO TOMAN DECISIONES.</p><p style="color:var(--amber)">LAS PERSONAS TOMAN DECISIONES CON DATOS.</p></div><div class="seal">SELLO FINAL · OPERACIÓN RECUPERAR EL DASHBOARD · E'+S.team+'</div></div>'}
+function render(){bar();slots();var s=$('screen'),o;
+if(S.stage===0)o=boot();
+else if(S.stage>=1&&S.stage<=5){var m=MIS[S.stage-1];o=(S.done[m.n]?sealScr(m):mission(m))+cons()}
+else if(S.stage===6)o=fin()+cons();
+else o=done();
+s.innerHTML=o+(S.stage>0?foot():'');for(var id in keep){var x=$(id);if(x)x.value=keep[id]}keep={};wire()}
+function bad(n,extra){S.fails[n]=(S.fails[n]||0)+1;save();var l=['ACCESO DENEGADO.','La clave ingresada no coincide con los registros del sistema.','Revisen los materiales de la misión.'];if(S.fails[n]>=3)l.push('PISTA DISPONIBLE EN EL MATERIAL DE LA MISIÓN. Consulten PISTA 1.');return msg('bad',l)}
+function wire(){var f;
+if(f=$('bf'))f.onsubmit=function(e){e.preventDefault();S.team=+$('tm').value;S.stage=1;save();render()};
+if(f=$('of'))f.onsubmit=function(e){e.preventDefault();S.open=S.stage;save();notice='';render();var k=$('fk');if(k)k.focus()};
+if(f=$('mf'))f.onsubmit=function(e){e.preventDefault();var m=MIS[S.stage-1];var ok=has(D.k[m.n],'k'+m.n,$('fk').value);m.codes.forEach(function(c){if(!has(D.c[c],c,$('f'+c).value))ok=false});
+if(ok){notice='';if(m.n===5){S.p5=1}else{S.rec.push(m.n);S.done[m.n]=1}save();render()}else{cap();notice=bad(m.n);render()}};
+if(f=$('rf'))f.onsubmit=function(e){e.preventDefault();var ok=true;for(var i=1;i<=5;i++)if(!has(D.k[i],'k'+i,$('r'+i).value))ok=false;
+if(ok){notice='';S.rec.push(5);S.done[5]=1;S.p5=2;save();render()}else{S.fails.r5=(S.fails.r5||0)+1;save();var l=['El recorrido no coincide con el proceso analítico.'];if(S.fails.r5>=3)l.push('PISTA DISPONIBLE EN EL MATERIAL DE LA MISIÓN. Consulten PISTA 1.');cap();notice=msg('bad',l);render()}};
+if(f=$('nf'))f.onsubmit=function(e){e.preventDefault();S.stage+=1;S.open=0;notice='';save();render();window.scrollTo(0,0)};
+if(f=$('ff'))f.onsubmit=function(e){e.preventDefault();finalCheck()};
+if(f=$('cf'))f.onsubmit=function(e){e.preventDefault();var v=$('cmd').value.trim();if(!v)return;$('cout').innerHTML=msg(...cmd(v));$('cmd').value=''};
+if(f=$('rs'))f.onclick=function(){f.outerHTML='<span>¿Borrar el progreso de este equipo? <button class="ghost" id="y" type="button">Sí, borrar</button> <button class="ghost" id="n" type="button">Cancelar</button></span>';$('y').onclick=function(){S={stage:0,team:0,rec:[],fails:{},helps:{},done:{},p5:0};notice='';save();render()};$('n').onclick=render}}
+function cmd(v){var t=v.toLowerCase();var k=(S.stage>=1&&S.stage<=5)?'h'+S.stage:'hf';
+if(/respuesta|c[oó]digo|resolv|solu|decime|dime|cu[aá]l es|qu[eé] (tenemos|ponemos|pongo|va)|clave es|dame/.test(t))return['warn',['SISTEMA HALCÓN','SOLICITUD NO AUTORIZADA.','La recuperación del sistema depende del análisis del equipo.','Revisen la evidencia disponible.']];
+if(/ayuda|pista|trab|bloque|help|perdid|no sabemos|no entend/.test(t)){S.helps[k]=(S.helps[k]||0)+1;save();return['warn',['PISTA DISPONIBLE EN EL MATERIAL DE LA MISIÓN.',S.helps[k]===1?'Consulten PISTA 1.':'Si continúan bloqueados: consulten PISTA 2.']]}
+return['warn',['COMANDO NO RECONOCIDO.','Usen INGRESAR CLAVE o escriban AYUDA.']]}
+function finalCheck(){var bads=[];var names=['AUDIENCIA','MEDICIÓN','CAMPAÑA','PLATAFORMAS','DECISIÓN'],ek=['a','b','c','d','e'];
+names.forEach(function(n,i){if(!has(D.ev[ek[i]],'e'+ek[i],$('e'+i).value))bads.push('Revisen la evidencia de '+n+'.')});
+var seen={};$('fm').value.split(/[,;\n]+/).forEach(function(x){if(!x.trim())return;var hh=h('memo',x);if(D.memo.indexOf(hh)>=0)seen[hh]=1});
+if(Object.keys(seen).length<3)bads.push('El memo tiene que usar datos de al menos tres misiones.');
+var rok=true;for(var i=0;i<6;i++)if(!has([D.rec[i]],'rec'+i,$('rc'+i).value))rok=false;
+if(!rok)bads.push('El recorrido no coincide con el proceso analítico.');
+if(!has(D.kpi,'kpi',$('fkpi').value))bads.push('El indicador no evalúa el objetivo de ventas.');
+var fok=true;for(var j=0;j<3;j++)if(!has([D.fr[j]],'fr'+j,$('fr'+j).value))fok=false;
+if(!fok)bads.push('La frase no está completa.');
+if(bads.length){S.fails.f=(S.fails.f||0)+1;save();if(S.fails.f>=3)bads.push('Pueden abrir una pista.');cap();notice=msg('bad',['No coincide.'].concat(bads));render();return}
+S.stage=7;save();render();var L=['VALIDANDO DECISIÓN...','','OBJETIVO: <span>VALIDADO</span>','DATOS: <span>VALIDADOS</span>','INTERPRETACIÓN: <span>VALIDADA</span>','HIPÓTESIS: <span>VALIDADA</span>','DECISIÓN: <span>VALIDADA</span>','NUEVA MEDICIÓN: <span>VALIDADA</span>','','RESTAURANDO SISTEMA...'];var i=0,box=$('vl');box.innerHTML='';$('rr').hidden=true;
+(function nx(){if(i<L.length){box.innerHTML+=L[i]+'<br>';i++;setTimeout(nx,matchMedia('(prefers-reduced-motion:reduce)').matches?0:450)}else{$('rr').hidden=false}})()}
+render();
+</script>
+
+</body></html>
